@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Манцева О.А. — Педагог</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.4.21/vue.global.prod.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap');
+
+    :root {
+      --green-dark:  #2d5016;
+      --green-mid:   #4a7c2f;
+      --green-light: #7ab648;
+      --green-pale:  #e8f5d8;
+      --cream:       #fdf9f3;
+      --text:        #2a2a2a;
+      --text-soft:   #5a5a5a;
+      --gold:        #c8974a;
+      --gold-light:  #f5e6c8;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Raleway', sans-serif;
+      background: var(--cream);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--cream); }
+    ::-webkit-scrollbar-thumb { background: var(--green-light); border-radius: 3px; }
+
+    /* ── NAVBAR ── */
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      transition: all 0.4s ease;
+    }
+    .navbar.scrolled {
+      background: rgba(45, 80, 22, 0.97);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 2px 20px rgba(0,0,0,0.2);
+    }
+    .navbar.top {
+      background: transparent;
+    }
+    .nav-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding: 0 32px; height: 68px;
+    }
+    .nav-logo {
+      color: #fff; font-family: 'Lora', serif;
+      font-size: 1.1rem; text-decoration: none;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .nav-logo .leaf { font-size: 1.4rem; }
+    .nav-links { display: flex; gap: 6px; }
+    .nav-links a {
+      color: rgba(255,255,255,0.85);
+      text-decoration: none; font-size: 0.88rem;
+      font-weight: 500; letter-spacing: 0.03em;
+      padding: 8px 14px; border-radius: 20px;
+      transition: all 0.25s;
+    }
+    .nav-links a:hover,
+    .nav-links a.active {
+      color: #fff;
+      background: rgba(255,255,255,0.15);
+    }
+    .nav-burger { display: none; cursor: pointer; flex-direction: column; gap: 5px; }
+    .nav-burger span { width: 24px; height: 2px; background: #fff; border-radius: 2px; transition: all 0.3s; }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      background: linear-gradient(160deg, var(--green-dark) 0%, var(--green-mid) 50%, #5a9e3a 100%);
+      display: flex; align-items: center; justify-content: center;
+      position: relative; overflow: hidden;
+      text-align: center; padding: 100px 24px 80px;
+    }
+    .hero-bg-circles {
+      position: absolute; inset: 0; pointer-events: none;
+    }
+    .hero-bg-circles span {
+      position: absolute; border-radius: 50%;
+      background: rgba(255,255,255,0.04);
+    }
+    .hero-bg-circles span:nth-child(1) { width: 600px; height: 600px; top: -200px; right: -150px; }
+    .hero-bg-circles span:nth-child(2) { width: 400px; height: 400px; bottom: -100px; left: -100px; }
+    .hero-bg-circles span:nth-child(3) { width: 200px; height: 200px; top: 40%; left: 10%; }
+
+    .hero-content { position: relative; z-index: 1; }
+
+    .hero-avatar {
+      width: 130px; height: 130px; border-radius: 50%;
+      margin: 0 auto 28px;
+      background: rgba(255,255,255,0.12);
+      border: 3px solid rgba(255,255,255,0.35);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 4rem;
+      box-shadow: 0 0 0 8px rgba(255,255,255,0.06), 0 20px 40px rgba(0,0,0,0.2);
+      animation: float 4s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .hero h1 {
+      font-family: 'Lora', serif; font-size: 2.6rem;
+      color: #fff; margin-bottom: 12px; line-height: 1.25;
+    }
+    .hero-subtitle {
+      font-size: 1.05rem; color: rgba(255,255,255,0.8);
+      margin-bottom: 8px; font-weight: 400;
+    }
+    .hero-org {
+      font-size: 0.88rem; color: rgba(255,255,255,0.55);
+      margin-bottom: 40px;
+    }
+    .hero-tags { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    .tag {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.9);
+      padding: 6px 16px; border-radius: 20px;
+      font-size: 0.82rem; font-weight: 500;
+      backdrop-filter: blur(4px);
+    }
+
+    .scroll-hint {
+      position: absolute; bottom: 30px; left: 50%;
+      transform: translateX(-50%);
+      color: rgba(255,255,255,0.4); font-size: 0.75rem;
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      animation: bounce 2s ease-in-out infinite;
+    }
+    .scroll-hint svg { width: 20px; opacity: 0.5; }
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(6px); }
+    }
+
+    /* ── SECTIONS ── */
+    .section {
+      max-width: 1000px; margin: 0 auto;
+      padding: 90px 32px;
+    }
+    .section-label {
+      font-size: 0.75rem; font-weight: 700;
+      letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--green-light); margin-bottom: 10px;
+    }
+    .section-title {
+      font-family: 'Lora', serif; font-size: 2rem;
+      color: var(--green-dark); margin-bottom: 36px;
+      position: relative; display: inline-block;
+    }
+    .section-title::after {
+      content: ''; position: absolute;
+      bottom: -10px; left: 0;
+      width: 48px; height: 3px;
+      background: var(--gold); border-radius: 2px;
+    }
+
+    /* ── ABOUT ── */
+    .about-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 20px; margin-top: 16px;
+    }
+    .about-card {
+      background: #fff; border-radius: 16px;
+      padding: 28px; position: relative; overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+      transition: transform 0.3s, box-shadow 0.3s;
+      cursor: default;
+    }
+    .about-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 30px rgba(74,124,47,0.12);
+    }
+    .about-card::before {
+      content: ''; position: absolute;
+      top: 0; left: 0; right: 0; height: 4px;
+      background: linear-gradient(90deg, var(--green-mid), var(--green-light));
+    }
+    .card-icon { font-size: 2rem; margin-bottom: 14px; }
+    .card-title {
+      font-weight: 700; color: var(--green-dark);
+      margin-bottom: 8px; font-size: 0.95rem;
+    }
+    .card-text {
+      font-size: 0.9rem; color: var(--text-soft);
+      line-height: 1.7;
+    }
+    .about-card.wide { grid-column: span 2; }
+
+    /* ── RESEARCH ── */
+    .research-hero {
+      background: linear-gradient(135deg, var(--green-dark), var(--green-mid));
+      border-radius: 20px; padding: 48px 44px;
+      color: #fff; margin-bottom: 36px;
+      position: relative; overflow: hidden;
+    }
+    .research-hero::after {
+      content: '🌿';
+      position: absolute; right: 40px; bottom: -10px;
+      font-size: 8rem; opacity: 0.08;
+    }
+    .research-hero h3 {
+      font-family: 'Lora', serif; font-size: 1.4rem;
+      margin-bottom: 16px; line-height: 1.4;
+    }
+    .research-hero p {
+      font-size: 0.93rem; opacity: 0.85; line-height: 1.75;
+    }
+    .research-stats {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 16px; margin-top: 28px;
+    }
+    .stat-card {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 12px; padding: 18px;
+      text-align: center;
+    }
+    .stat-num {
+      font-size: 2rem; font-weight: 700;
+      color: var(--gold-light); font-family: 'Lora', serif;
+    }
+    .stat-label { font-size: 0.78rem; opacity: 0.75; margin-top: 4px; }
+
+    /* TALE GRID */
+    .tales-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 14px; margin-top: 8px;
+    }
+    .tale-card {
+      background: #fff; border-radius: 12px;
+      padding: 16px 18px;
+      border: 1.5px solid var(--green-pale);
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 0.88rem; line-height: 1.4; color: var(--text);
+      transition: all 0.25s; cursor: default;
+    }
+    .tale-card:hover {
+      border-color: var(--green-light);
+      background: var(--green-pale);
+      transform: translateY(-2px);
+    }
+    .tale-card .tale-icon { font-size: 1.3rem; flex-shrink: 0; }
+
+    /* ── MATERIALS TABLE ── */
+    .mat-table {
+      width: 100%; border-collapse: separate;
+      border-spacing: 0; border-radius: 16px;
+      overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+    }
+    .mat-table th {
+      background: var(--green-dark);
+      color: #fff; padding: 14px 18px;
+      font-size: 0.85rem; font-weight: 600;
+      letter-spacing: 0.02em; text-align: left;
+    }
+    .mat-table td {
+      background: #fff; padding: 13px 18px;
+      font-size: 0.88rem; line-height: 1.55;
+      border-bottom: 1px solid #f0ede8;
+      vertical-align: top;
+    }
+    .mat-table tr:last-child td { border-bottom: none; }
+    .mat-table tr:hover td { background: var(--green-pale); }
+
+    .badge {
+      display: inline-block;
+      background: var(--green-pale);
+      color: var(--green-mid);
+      border-radius: 6px;
+      padding: 2px 8px; font-size: 0.78rem; font-weight: 600;
+    }
+
+    /* ── PARENTS ── */
+    .parents-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 20px; margin-top: 8px;
+    }
+    .parent-card {
+      background: #fff; border-radius: 16px;
+      padding: 26px 22px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+      transition: transform 0.3s, box-shadow 0.3s;
+      cursor: default;
+    }
+    .parent-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 28px rgba(74,124,47,0.13);
+    }
+    .parent-icon {
+      width: 52px; height: 52px; border-radius: 14px;
+      background: var(--green-pale);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem; margin-bottom: 16px;
+    }
+    .parent-card h3 {
+      font-size: 0.95rem; font-weight: 700;
+      color: var(--green-dark); margin-bottom: 10px;
+    }
+    .parent-card p { font-size: 0.87rem; color: var(--text-soft); line-height: 1.65; }
+
+    /* ── CONTACTS ── */
+    .contacts-wrap {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 28px;
+    }
+    .contact-info {
+      background: #fff; border-radius: 16px;
+      padding: 32px; box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    }
+    .contact-row {
+      display: flex; gap: 14px; align-items: flex-start;
+      margin-bottom: 20px; padding-bottom: 20px;
+      border-bottom: 1px solid #f0ede8;
+    }
+    .contact-row:last-child { margin: 0; padding: 0; border: none; }
+    .contact-ico {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: var(--green-pale); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+    }
+    .contact-label {
+      font-size: 0.75rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--text-soft); margin-bottom: 3px;
+    }
+    .contact-value { font-size: 0.92rem; color: var(--text); font-weight: 500; }
+
+    /* FORM */
+    .contact-form {
+      background: linear-gradient(160deg, var(--green-dark), var(--green-mid));
+      border-radius: 16px; padding: 32px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+    }
+    .contact-form h3 {
+      color: #fff; font-family: 'Lora', serif;
+      font-size: 1.2rem; margin-bottom: 22px;
+    }
+    .form-group { margin-bottom: 14px; }
+    .form-group input,
+    .form-group textarea {
+      width: 100%; padding: 12px 16px;
+      border: 1.5px solid rgba(255,255,255,0.2);
+      border-radius: 10px;
+      background: rgba(255,255,255,0.1);
+      color: #fff; font-family: 'Raleway', sans-serif;
+      font-size: 0.9rem;
+      transition: border-color 0.25s, background 0.25s;
+      outline: none;
+    }
+    .form-group input::placeholder,
+    .form-group textarea::placeholder { color: rgba(255,255,255,0.45); }
+    .form-group input:focus,
+    .form-group textarea:focus {
+      border-color: rgba(255,255,255,0.5);
+      background: rgba(255,255,255,0.15);
+    }
+    .form-group textarea { resize: vertical; min-height: 100px; }
+    .btn-send {
+      width: 100%; padding: 13px;
+      background: var(--gold); color: #fff;
+      border: none; border-radius: 10px;
+      font-family: 'Raleway', sans-serif;
+      font-size: 0.95rem; font-weight: 700;
+      cursor: pointer; letter-spacing: 0.04em;
+      transition: background 0.25s, transform 0.2s;
+    }
+    .btn-send:hover { background: #b5832f; transform: translateY(-1px); }
+    .btn-send:active { transform: translateY(0); }
+    .sent-msg {
+      text-align: center; color: #d4f0b4;
+      font-size: 0.95rem; padding: 12px 0;
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      max-width: 1000px; margin: 0 auto;
+      border: none; border-top: 1px solid #e8e2d9;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--green-dark); color: rgba(255,255,255,0.5);
+      text-align: center; padding: 28px 24px;
+      font-size: 0.82rem; line-height: 1.7;
+    }
+    footer a { color: rgba(255,255,255,0.65); text-decoration: none; }
+    footer a:hover { color: #fff; }
+
+    /* ── FADE-IN ── */
+    .fade-in {
+      opacity: 0; transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .fade-in.visible { opacity: 1; transform: translateY(0); }
+    .fade-in:nth-child(2) { transition-delay: 0.1s; }
+    .fade-in:nth-child(3) { transition-delay: 0.2s; }
+    .fade-in:nth-child(4) { transition-delay: 0.3s; }
+
+    /* ── MOBILE ── */
+    @media (max-width: 700px) {
+      .nav-links { display: none; }
+      .nav-burger { display: flex; }
+      .nav-links.open {
+        display: flex; flex-direction: column;
+        position: fixed; top: 68px; left: 0; right: 0;
+        background: rgba(45,80,22,0.97);
+        padding: 16px 24px;
+        gap: 4px;
+      }
+      .hero h1 { font-size: 1.8rem; }
+      .about-grid { grid-template-columns: 1fr; }
+      .about-card.wide { grid-column: span 1; }
+      .research-stats { grid-template-columns: 1fr 1fr; }
+      .contacts-wrap { grid-template-columns: 1fr; }
+      .section { padding: 60px 20px; }
+      .mat-table { font-size: 0.82rem; }
+      .mat-table th, .mat-table td { padding: 10px 12px; }
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- NAVBAR -->
+  <header :class="['navbar', scrolled ? 'scrolled' : 'top']">
+    <div class="nav-inner">
+      <a class="nav-logo" href="#hero">
+        <span class="leaf">🌿</span>
+        Манцева О.А.
+      </a>
+      <nav :class="['nav-links', menuOpen ? 'open' : '']">
+        <a v-for="link in navLinks" :key="link.id"
+           :href="'#' + link.id"
+           :class="{ active: activeSection === link.id }"
+           @click="menuOpen = false">{{ link.label }}</a>
+      </nav>
+      <div class="nav-burger" @click="menuOpen = !menuOpen">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero" id="hero">
+    <div class="hero-bg-circles">
+      <span></span><span></span><span></span>
+    </div>
+    <div class="hero-content">
+      <div class="hero-avatar">🌸</div>
+      <h1>Манцева Ольга<br>Александровна</h1>
+      <p class="hero-subtitle">Воспитатель дошкольного образования</p>
+      <p class="hero-org">МАДОУ «ДСКВ 35», г. Бугры &nbsp;·&nbsp; НовГУ им. Ярослава Мудрого</p>
+      <div class="hero-tags">
+        <span class="tag">🎓 Дошкольное образование</span>
+        <span class="tag">📖 Развитие словаря</span>
+        <span class="tag">🧡 Дети с ЗПР</span>
+        <span class="tag">✨ Сказкотерапия</span>
+      </div>
+    </div>
+    <div class="scroll-hint">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M7 10l5 5 5-5"/>
+      </svg>
+      листайте вниз
+    </div>
+  </section>
+
+  <!-- О СЕБЕ -->
+  <section class="section" id="about">
+    <p class="section-label">Знакомство</p>
+    <h2 class="section-title">О себе</h2>
+    <div class="about-grid">
+      <div class="about-card fade-in" v-for="card in aboutCards" :key="card.title"
+           :class="{ wide: card.wide }">
+        <div class="card-icon">{{ card.icon }}</div>
+        <div class="card-title">{{ card.title }}</div>
+        <div class="card-text">{{ card.text }}</div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ИССЛЕДОВАНИЕ -->
+  <section class="section" id="research">
+    <p class="section-label">Научная деятельность</p>
+    <h2 class="section-title">Моё исследование</h2>
+
+    <div class="research-hero">
+      <h3>«Развитие словаря детей дошкольного возраста с задержкой психического развития средствами сказки»</h3>
+      <p>Исследование проводилось на базе МАДОУ «ДСКВ 35» г. Бугры в подготовительной группе для детей с ЗПР. Использовалась диагностическая методика Т. Б. Филичевой и Г. В. Чиркиной.</p>
+      <div class="research-stats">
+        <div class="stat-card" v-for="s in stats" :key="s.label">
+          <div class="stat-num">{{ s.num }}</div>
+          <div class="stat-label">{{ s.label }}</div>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="font-family:'Lora',serif; color:var(--green-dark); margin-bottom:16px; font-size:1.1rem;">
+      Сказки формирующего эксперимента
+    </h3>
+    <div class="tales-grid">
+      <div class="tale-card fade-in" v-for="t in tales" :key="t.name">
+        <span class="tale-icon">{{ t.icon }}</span>
+        <span>{{ t.name }}</span>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- МАТЕРИАЛЫ -->
+  <section class="section" id="materials">
+    <p class="section-label">Методика</p>
+    <h2 class="section-title">Методические материалы</h2>
+    <p style="margin-bottom:28px; color:var(--text-soft); font-size:0.95rem; line-height:1.75;">
+      Приёмы и задачи, применявшиеся при работе с каждой сказкой в ходе формирующего эксперимента.
+    </p>
+    <table class="mat-table">
+      <thead>
+        <tr>
+          <th>Сказка</th>
+          <th>Задача развития словаря</th>
+          <th>Приёмы работы</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="m in materials" :key="m.tale">
+          <td><strong>{{ m.tale }}</strong></td>
+          <td><span class="badge">{{ m.task }}</span></td>
+          <td>{{ m.methods }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <hr class="divider">
+
+  <!-- РОДИТЕЛЯМ -->
+  <section class="section" id="parents">
+    <p class="section-label">Советы</p>
+    <h2 class="section-title">Для родителей</h2>
+    <p style="margin-bottom:28px; color:var(--text-soft); font-size:0.95rem; line-height:1.75;">
+      Читайте сказки вместе с детьми — это лучшее, что можно сделать для развития речи ребёнка с ЗПР в домашних условиях.
+    </p>
+    <div class="parents-grid">
+      <div class="parent-card fade-in" v-for="tip in parentTips" :key="tip.title">
+        <div class="parent-icon">{{ tip.icon }}</div>
+        <h3>{{ tip.title }}</h3>
+        <p>{{ tip.text }}</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- КОНТАКТЫ -->
+  <section class="section" id="contacts">
+    <p class="section-label">Связь</p>
+    <h2 class="section-title">Контакты</h2>
+    <div class="contacts-wrap">
+      <div class="contact-info">
+        <div class="contact-row" v-for="c in contactInfo" :key="c.label">
+          <div class="contact-ico">{{ c.icon }}</div>
+          <div>
+            <div class="contact-label">{{ c.label }}</div>
+            <div class="contact-value">{{ c.value }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="contact-form">
+        <h3>Написать мне</h3>
+        <template v-if="!formSent">
+          <div class="form-group">
+            <input v-model="form.name" type="text" placeholder="Ваше имя">
+          </div>
+          <div class="form-group">
+            <input v-model="form.email" type="email" placeholder="E-mail">
+          </div>
+          <div class="form-group">
+            <textarea v-model="form.message" placeholder="Ваше сообщение…"></textarea>
+          </div>
+          <button class="btn-send" @click="sendForm">Отправить сообщение</button>
+        </template>
+        <div v-else class="sent-msg">
+          ✅ Спасибо, {{ form.name }}! Сообщение отправлено.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>© 2025 Манцева Ольга Александровна &nbsp;·&nbsp; Персональный сайт педагога</p>
+    <p style="margin-top:6px;">
+      НовГУ им. Ярослава Мудрого &nbsp;·&nbsp;
+      МАДОУ «ДСКВ 35», г. Бугры &nbsp;·&nbsp;
+      Руководитель: Мигунова Е. В.
+    </p>
+  </footer>
+
+</div>
+
+<script>
+const { createApp, ref, reactive, onMounted, onUnmounted } = Vue;
+
+createApp({
+  setup() {
+    const scrolled   = ref(false);
+    const menuOpen   = ref(false);
+    const formSent   = ref(false);
+    const activeSection = ref('hero');
+
+    const form = reactive({ name: '', email: '', message: '' });
+
+    const navLinks = [
+      { id: 'about',     label: 'О себе' },
+      { id: 'research',  label: 'Исследование' },
+      { id: 'materials', label: 'Материалы' },
+      { id: 'parents',   label: 'Родителям' },
+      { id: 'contacts',  label: 'Контакты' },
+    ];
+
+    const aboutCards = [
+      { icon: '🎓', title: 'Образование',
+        text: 'НовГУ им. Ярослава Мудрого, Педагогический институт, направление 44.03.01 «Педагогическое образование», профиль «Дошкольное образование», группа 3662зу, заочная форма обучения.' },
+      { icon: '🔬', title: 'Исследовательский интерес',
+        text: 'Развитие словаря детей дошкольного возраста с задержкой психического развития (ЗПР) средствами русской народной и авторской сказки.' },
+      { icon: '🏫', title: 'База практики',
+        text: 'МАДОУ «ДСКВ 35», г. Бугры, Воронцовский бульвар, д. 5, корп. 3. Подготовительная группа для детей с ЗПР (6–7 лет).' },
+      { icon: '💡', title: 'Научный руководитель',
+        text: 'Мигунова Е. В., кафедра начального, дошкольного образования и социального управления НовГУ им. Ярослава Мудрого.' },
+    ];
+
+    const stats = [
+      { num: '10',  label: 'детей в эксперименте' },
+      { num: '10',  label: 'сказок проработано' },
+      { num: '0%',  label: 'высокий уровень (до)' },
+    ];
+
+    const tales = [
+      { icon: '🌱', name: '«Репка»' },
+      { icon: '🏠', name: '«Теремок»' },
+      { icon: '🐰', name: '«Заяц-хваста»' },
+      { icon: '🦢', name: '«Гуси-Лебеди»' },
+      { icon: '❄️', name: '«Зимовье зверей»' },
+      { icon: '🌸', name: '«Цветик-семицветик»' },
+      { icon: '🐷', name: '«Три поросёнка»' },
+      { icon: '📞', name: '«Телефон» Чуковский' },
+      { icon: '👵', name: '«Бабушка, внучка да курочка»' },
+      { icon: '📚', name: 'Занятие «Вот какие сказки»' },
+    ];
+
+    const materials = [
+      { tale: '«Репка»', task: 'Антонимы', methods: 'Мнемотаблицы, пересказ, игра «Скажи наоборот», частица «не»' },
+      { tale: '«Теремок»', task: 'Словарь животных', methods: 'Составление рассказов, игра «Угадай кто»' },
+      { tale: '«Заяц-хваста»', task: 'Эпитеты, новые слова', methods: 'Беседа, игра «Какой, какая, какое»' },
+      { tale: '«Гуси-Лебеди»', task: 'Согласование слов', methods: 'Игра «Разложи по порядку», «Подбери действия»' },
+      { tale: '«Зимовье зверей»', task: 'Антонимы-прилагательные', methods: 'Игра «Наоборот», игра-драматизация' },
+      { tale: '«Цветик-семицветик»', task: 'Предметный словарь', methods: 'Описательный рассказ, «Назови одним словом»' },
+      { tale: '«Три поросёнка»', task: 'Суффиксы -ик/-очк', methods: 'Пересказ, игра «Назови ласково»' },
+    ];
+
+    const parentTips = [
+      { icon: '📖', title: 'Как читать', text: 'Читайте медленно и выразительно. Делайте паузы, спрашивайте «Кто это? Что делает?» Объясняйте незнакомые слова сразу.' },
+      { icon: '🗣️', title: 'После чтения', text: 'Попросите пересказать сказку. Разыграйте сценку вместе. Попросите нарисовать любимого героя.' },
+      { icon: '🎲', title: 'Речевые игры', text: '«Угадай героя» — описываете, ребёнок называет. «Назови ласково» — домик, зайчик. «Скажи наоборот» — большой/маленький.' },
+      { icon: '📋', title: 'Рекомендуемые сказки', text: '«Репка», «Теремок», «Колобок», «Три поросёнка», «Гуси-Лебеди», «Зимовье зверей», «Цветик-семицветик».' },
+    ];
+
+    const contactInfo = [
+      { icon: '👩‍🏫', label: 'ФИО', value: 'Манцева Ольга Александровна' },
+      { icon: '🎓', label: 'Учебное заведение', value: 'НовГУ им. Ярослава Мудрого, группа 3662зу' },
+      { icon: '🏫', label: 'База практики', value: 'МАДОУ «ДСКВ 35», г. Бугры, Воронцовский бульвар, д. 5, корп. 3' },
+      { icon: '✉️', label: 'E-mail', value: 'mantseva.oa@student.novsu.ru' },
+    ];
+
+    // Scroll handler
+    function onScroll() {
+      scrolled.value = window.scrollY > 40;
+
+      const sections = ['hero', 'about', 'research', 'materials', 'parents', 'contacts'];
+      for (let i = sections.length - 1; i >= 0; i--) {
+        const el = document.getElementById(sections[i]);
+        if (el && window.scrollY >= el.offsetTop - 120) {
+          activeSection.value = sections[i];
+          break;
+        }
+      }
+
+      // Fade-in
+      document.querySelectorAll('.fade-in').forEach(el => {
+        if (el.getBoundingClientRect().top < window.innerHeight - 60) {
+          el.classList.add('visible');
+        }
+      });
+    }
+
+    function sendForm() {
+      if (form.name && form.message) formSent.value = true;
+    }
+
+    onMounted(() => {
+      window.addEventListener('scroll', onScroll);
+      onScroll();
+    });
+    onUnmounted(() => window.removeEventListener('scroll', onScroll));
+
+    return {
+      scrolled, menuOpen, activeSection,
+      navLinks, aboutCards, stats, tales,
+      materials, parentTips, contactInfo,
+      form, formSent, sendForm,
+    };
+  }
+}).mount('#app');
+</script>
+</body>
+</html>
